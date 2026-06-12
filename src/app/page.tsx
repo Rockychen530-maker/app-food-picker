@@ -35,8 +35,26 @@ interface LocationState {
 
 // ==================== Constants ====================
 const CUISINES = ["中式", "日式", "韓式", "美式", "義式", "在地小吃", "異國料理"];
-const BUDGET_LABELS = ["<$100", "$100-300", ">$300"];
+const BUDGET_LABELS = ["<$100", "$100-300", "<$300"];
 const DISTANCE_OPTIONS = [500, 1000, 5000];
+
+// Cuisine to emoji mapping for visual identification
+const CUISINE_EMOJI: Record<string, string> = {
+  "中式": "🥡",
+  "日式": "🍣",
+  "韓式": "🥩",
+  "美式": "🍔",
+  "義式": "🍝",
+  "在地小吃": "🍜",
+  "異國料理": "🌮",
+};
+
+// Get stable image URL based on restaurant name
+function getRestaurantImage(name: string, cuisineType: string): string {
+  // Use picsum with seed for consistent images per restaurant
+  const seed = encodeURIComponent(name);
+  return `https://picsum.photos/seed/${seed}/200/200`;
+}
 
 // Demo data for when API fails
 const DEMO_RESTAURANTS: Restaurant[] = [
@@ -328,17 +346,59 @@ function RestaurantCard({ restaurant, onClose, onRetry }: { restaurant: Restaura
 }
 
 // Ad Banner
+// Google AdSense Component
+// 設定方式：
+// 1. 申請 Google AdSense https://www.google.com/adsense
+// 2. 取得你的 ca-pub-XXXXXXXXXX ID
+// 3. 替換下方 YOUR_AD_CLIENT_ID
+// 4. 替換 YOUR_AD_SLOT_ID 為你的廣告單元 ID
+
 function AdBanner() {
-  return (
-    <div className="bg-gradient-to-r from-[#FFF8F0] to-[#FDEBD0] border border-[#F39C12]/30 rounded-xl p-4 flex items-center gap-3">
-      <div className="w-10 h-10 rounded-lg bg-[#F39C12]/20 flex items-center justify-center text-xl">🍔</div>
-      <div className="flex-1">
-        <p className="text-xs text-gray-400">廣告</p>
-        <p className="text-sm font-medium text-gray-700">美食外送首選 - 新用戶免運！</p>
+  const adClientId = "YOUR_AD_CLIENT_ID";
+  const adSlotId = "YOUR_AD_SLOT_ID";
+  
+  const isConfigured = adClientId !== "YOUR_AD_CLIENT_ID";
+
+  if (!isConfigured) {
+    // 尚未設定 AdSense，顯示示範廣告
+    return (
+      <div className="bg-gradient-to-r from-[#FFF8F0] to-[#FDEBD0] border border-[#F39C12]/30 rounded-xl p-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-[#F39C12]/20 flex items-center justify-center text-xl">🍔</div>
+          <div className="flex-1">
+            <p className="text-xs text-gray-400">廣告（待設定）</p>
+            <p className="text-sm font-medium text-gray-700">美食外送首選 - 新用戶免運！</p>
+          </div>
+          <button className="text-xs text-[#E74C3C] font-medium">詳情</button>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          💡 設定 AdSense 後，這裡會顯示真實廣告
+        </p>
       </div>
-      <button className="text-xs text-[#E74C3C] font-medium">詳情</button>
-    </div>
+    );
+  }
+
+  // 已設定 AdSense，顯示實際廣告
+  return (
+    <ins 
+      className="adsbygoogle"
+      style={{ display: "block", width: "100%", height: "90px" }}
+      data-ad-client={adClientId}
+      data-ad-slot={adSlotId}
+      data-ad-format="horizontal"
+    />
   );
+}
+
+// 載入 AdSense Script (在 layout 中呼叫)
+function loadAdSenseScript() {
+  if (typeof window !== "undefined") {
+    const script = document.createElement("script");
+    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
+    script.async = true;
+    script.crossOrigin = "anonymous";
+    document.head.appendChild(script);
+  }
 }
 
 // Bottom Stats
@@ -534,8 +594,16 @@ export default function HomePage() {
                 }}
                 className="restaurant-card w-full p-4 text-left flex items-center gap-3"
               >
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${r.isHidden ? "bg-yellow-100" : "bg-gray-100"}`}>
-                  {r.isHidden ? "⭐" : "🍽️"}
+                <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                  <img
+                    src={getRestaurantImage(r.name, r.cuisineType)}
+                    alt={r.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-xs">
+                    {CUISINE_EMOJI[r.cuisineType] || "🍽️"}
+                  </div>
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">

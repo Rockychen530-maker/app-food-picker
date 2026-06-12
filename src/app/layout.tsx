@@ -36,6 +36,8 @@ export default function RootLayout({
     <html lang="zh-TW">
       <head>
         <link rel="icon" href="/favicon.ico" />
+        {/* Google AdSense - 替換 YOUR_AD_CLIENT_ID 為你的 ID */}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR_AD_CLIENT_ID" crossOrigin="anonymous"></script>
       </head>
       <body className={`${notoSansTC.variable}`} style={{ fontFamily: "'Noto Sans TC', sans-serif" }}>
         {children}
