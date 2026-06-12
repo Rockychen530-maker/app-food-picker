@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary: #E74C3C;
+  --color-primary-dark: #C0392B;
+  --color-secondary: #F39C12;
+  --color-gold: #F1C40F;
+  --color-map-blue: #3498DB;
+  --color-bg: #FFF8F0;
+  --color-bg-warm: #FFF5EB;
+  --color-text: #2C3E50;
+  --color-text-light: #7F8C8D;
+  --color-white: #FFFFFF;
+  --color-border: #ECF0F1;
+  --color-shadow: rgba(0, 0, 0, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Noto Sans TC', sans-serif;
+  min-height: 100dvh;
+  overscroll-behavior: none;
+}
+
+/* Pokeball Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes bounce-in {
+  0% { transform: scale(0); opacity: 0; }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(231, 76, 60, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(231, 76, 60, 0.6); }
+}
+
+.animate-spin { animation: spin 1s ease-in-out; }
+.animate-bounce-in { animation: bounce-in 0.5s ease-out; }
+.animate-slide-up { animation: slide-up 0.4s ease-out; }
+.animate-pulse-glow { animation: pulse-glow 2s infinite; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--color-border); }
+::-webkit-scrollbar-thumb { background: var(--color-primary); border-radius: 4px; }
+
+/* Map Container */
+.map-container {
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px var(--color-shadow);
+}
+
+/* Filter Tags */
+.filter-tag {
+  transition: all 0.2s ease;
+}
+
+.filter-tag.active {
+  background: var(--color-primary);
+  color: white;
+  border-color: var(--color-primary);
+}
+
+/* Card */
+.restaurant-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px var(--color-shadow);
+  transition: transform 0.2s ease;
+}
+
+.restaurant-card:active {
+  transform: scale(0.98);
+}
+
+/* Pokeball Button */
+.pokeball-btn {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #E74C3C 0%, #E74C3C 45%, #2C3E50 45%, #2C3E50 55%, #E74C3C 55%, #E74C3C 100%);
+  border: 4px solid #2C3E50;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(231, 76, 60, 0.4);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pokeball-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  background: white;
+  border-radius: 50%;
+  border: 4px solid #2C3E50;
+}
+
+.pokeball-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 30px rgba(231, 76, 60, 0.5);
+}
+
+.pokeball-btn:active {
+  transform: scale(0.95);
+}
+
+.pokeball-btn.spinning {
+  animation: spin 0.8s ease-in-out;
+}
+
+/* Bottom Sheet */
+.bottom-sheet {
+  background: white;
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Loading Skeleton */
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}

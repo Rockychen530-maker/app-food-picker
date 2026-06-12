@@ -1,0 +1,21 @@
+{
+  "name": "就決定是你了",
+  "short_name": "決定了",
+  "description": "AI 美食推薦 - 一秒解決三餐選擇困難症",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFF8F0",
+  "theme_color": "#E74C3C",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
