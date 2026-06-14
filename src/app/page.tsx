@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, startTransition } from "react";
+import Image from "next/image";
 
 // ==================== Types ====================
 interface Restaurant {
@@ -50,7 +51,7 @@ const CUISINE_EMOJI: Record<string, string> = {
 };
 
 // Get stable image URL based on restaurant name
-function getRestaurantImage(name: string, cuisineType: string): string {
+function getRestaurantImage(name: string): string {
   // Use picsum with seed for consistent images per restaurant
   const seed = encodeURIComponent(name);
   return `https://picsum.photos/seed/${seed}/200/200`;
@@ -390,17 +391,6 @@ function AdBanner() {
   );
 }
 
-// 載入 AdSense Script (在 layout 中呼叫)
-function loadAdSenseScript() {
-  if (typeof window !== "undefined") {
-    const script = document.createElement("script");
-    script.src = "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js";
-    script.async = true;
-    script.crossOrigin = "anonymous";
-    document.head.appendChild(script);
-  }
-}
-
 // Bottom Stats
 function BottomStats({ count, hiddenCount, loading }: { count: number; hiddenCount: number; loading: boolean }) {
   if (loading) {
@@ -436,13 +426,13 @@ export default function HomePage() {
   const [isSpinning, setIsSpinning] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [loading, setLoading] = useState(true);
+
   const [location, setLocation] = useState<LocationState | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const locationRef = useRef<LocationState | null>(null);
 
   // Fetch restaurants from API
   const fetchRestaurants = useCallback(async (lat: number, lng: number) => {
     setLoading(true);
-    setError(null);
     try {
       const query = filters.cuisines.length > 0 ? filters.cuisines.join(",") : "餐廳";
       const response = await fetch(`/api/restaurants?lat=${lat}&lng=${lng}&q=${encodeURIComponent(query)}&num=20`);
@@ -455,7 +445,6 @@ export default function HomePage() {
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("無法載入餐廳，使用示範資料");
       setRestaurants(DEMO_RESTAURANTS);
     } finally {
       setLoading(false);
@@ -468,31 +457,29 @@ export default function HomePage() {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setLocation({
-            lat: latitude,
-            lng: longitude,
-            name: "目前位置",
-          });
-          fetchRestaurants(latitude, longitude);
+          const loc = { lat: latitude, lng: longitude, name: "目前位置" };
+          locationRef.current = loc;
+          startTransition(() => setLocation(loc));
         },
         () => {
-          // Fallback to Taipei if location denied
-          setLocation({ lat: 25.033, lng: 121.5654, name: "台北市" });
-          fetchRestaurants(25.033, 121.5654);
+          const loc = { lat: 25.033, lng: 121.5654, name: "台北市" };
+          locationRef.current = loc;
+          startTransition(() => setLocation(loc));
         }
       );
     } else {
-      setLocation({ lat: 25.033, lng: 121.5654, name: "台北市" });
-      fetchRestaurants(25.033, 121.5654);
+      const loc = { lat: 25.033, lng: 121.5654, name: "台北市" };
+      locationRef.current = loc;
+      startTransition(() => setLocation(loc));
     }
   }, []);
 
   // Re-fetch when filters change
   useEffect(() => {
-    if (location) {
-      fetchRestaurants(location.lat, location.lng);
+    if (locationRef.current) {
+      fetchRestaurants(locationRef.current.lat, locationRef.current.lng);
     }
-  }, [filters.cuisines, filters.distance, location, fetchRestaurants]);
+  }, [filters.cuisines, filters.distance, fetchRestaurants]);
 
   // Filter restaurants based on filters
   const filteredRestaurants = restaurants.filter((r) => {
@@ -595,10 +582,12 @@ export default function HomePage() {
                 className="restaurant-card w-full p-4 text-left flex items-center gap-3"
               >
                 <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
-                  <img
-                    src={getRestaurantImage(r.name, r.cuisineType)}
+                  <Image
+                    src={getRestaurantImage(r.name)}
                     alt={r.name}
-                    className="w-full h-full object-cover"
+                    width={56}
+                    height={56}
+                    className="object-cover"
                     loading="lazy"
                   />
                   <div className="absolute bottom-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 flex items-center justify-center text-xs">
