@@ -48,7 +48,10 @@ echo "  → 不要勾選任何選項（保持空白）"
 echo "========================================"
 echo ""
 
-read -p "請貼上你的 GitHub repo URL（例如：https://github.com/你的帳號/app-food-picker.git）：" GITHUB_URL
+# 優先使用環境變數，否則互動式詢問
+if [ -z "$GITHUB_URL" ]; then
+    read -p "請貼上你的 GitHub repo URL（例如：https://github.com/你的帳號/app-food-picker.git）：" GITHUB_URL
+fi
 
 # 設定 remote 並推送
 echo "🚀 推送程式碼到 GitHub..."
