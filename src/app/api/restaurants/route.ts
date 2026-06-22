@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const SERP_API_KEY = process.env.SERP_API_KEY || "5f11c3e9d1bad1a29bf9856347a61ae28fb782a8abaa6325df5c2f49c23e1c43";
+const SERP_API_KEY = process.env.SERP_API_KEY;
 const SERP_API_BASE = "https://serpapi.com/search";
 
 interface SerpResult {
@@ -78,6 +78,10 @@ function mapSerpToRestaurant(item: NonNullable<SerpApiResponse["local_results"]>
 }
 
 export async function GET(request: NextRequest) {
+  if (!SERP_API_KEY) {
+    return NextResponse.json({ error: "SERP_API_KEY environment variable is not set. Please configure your SerpApi key." }, { status: 500 });
+  }
+
   const searchParams = request.nextUrl.searchParams;
   const lat = searchParams.get("lat") || "25.0330";
   const lng = searchParams.get("lng") || "121.5654";
