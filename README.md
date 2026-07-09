@@ -4,8 +4,8 @@
 
 AI 美食推薦 + 街景隱藏店家挖掘，手機版 Web App（響應式設計）。
 
-![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![React](https://img.shields.io/badge/React-19-blue)
+![Next.js](https://img.shields.io/badge/Next.js-16.2.10-black)
+![React](https://img.shields.io/badge/React-19.2.7-blue)
 ![Tailwind](https://img.shields.io/badge/Tailwind-4-38bdf8)
 
 ---
@@ -89,9 +89,9 @@ public/
 
 ## 🔧 技術棧
 
-- **Framework**：Next.js 16（App Router）
+- **Framework**：Next.js 16.2.10（App Router）
 - **Styling**：Tailwind CSS 4
-- **地圖**：Google Maps JavaScript API + Places API
+- **餐廳資料**：SerpApi（Google Maps 整合）
 - **部署**：Vercel
 
 ---

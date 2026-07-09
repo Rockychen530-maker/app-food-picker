@@ -3,6 +3,23 @@ import { NextRequest, NextResponse } from "next/server";
 const SERP_API_KEY = process.env.SERP_API_KEY;
 const SERP_API_BASE = "https://serpapi.com/search";
 
+// Simple in-memory rate limiter: 30 requests per IP per minute
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+const RATE_LIMIT = 30;
+const RATE_WINDOW_MS = 60_000;
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_WINDOW_MS });
+    return true;
+  }
+  if (entry.count >= RATE_LIMIT) return false;
+  entry.count++;
+  return true;
+}
+
 interface SerpResult {
   id?: string;
   title?: string;
@@ -78,6 +95,18 @@ function mapSerpToRestaurant(item: NonNullable<SerpApiResponse["local_results"]>
 }
 
 export async function GET(request: NextRequest) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown";
+
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: "Too many requests. Please wait a moment and try again." },
+      { status: 429 }
+    );
+  }
+
   if (!SERP_API_KEY) {
     return NextResponse.json({ error: "SERP_API_KEY environment variable is not set. Please configure your SerpApi key." }, { status: 500 });
   }

@@ -46,7 +46,7 @@
 
 ### 3.1 前端框架
 
-- **Framework**：Next.js 15（App Router）
+- **Framework**：Next.js 16.2.10（App Router）
 - **Styling**：Tailwind CSS
 - **地圖**：Google Maps JavaScript API
 - **動畫**：Framer Motion
