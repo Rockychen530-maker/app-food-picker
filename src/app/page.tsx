@@ -485,6 +485,10 @@ export default function HomePage() {
   const filteredRestaurants = restaurants.filter((r) => {
     if (filters.budget >= 0 && r.priceLevel !== filters.budget) return false;
     if (filters.cuisines.length > 0 && !filters.cuisines.includes(r.cuisineType)) return false;
+    // Parse distance string like "320m" or "1.2km" to meters for comparison
+    const distStr = r.distance.replace("km", "").replace("m", "");
+    const distNum = r.distance.includes("km") ? parseFloat(distStr) * 1000 : parseFloat(distStr);
+    if (distNum > filters.distance) return false;
     return true;
   });
 
